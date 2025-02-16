@@ -1,0 +1,102 @@
+#!/bin/bash
+
+# Function to resize and trim the video in a single ffmpeg command
+process_video() {
+    local input_file=$1
+    local start_time=$2
+    local end_time=$3
+    local output_file=$4
+
+    # Use ffmpeg to both resize and trim in one pass
+    ffmpeg -i "$input_file" -ss "$start_time" -to "$end_time" -vf "scale=1920:1080" -r 30 -c:v libx264 -crf 18 -preset slow -c:a aac -b:a 192k "$output_file"
+    notify-send "Process Complete" "Your processed video has been saved as: $output_file"
+}
+
+# Main script
+if [[ $# -lt 2 ]]; then
+    echo "[-] Error: Invalid syntax!"
+    echo "Usage: v-trim [-r] [-t {starttime-endtime}] input_file"
+    exit 1
+fi
+
+# Default values for flags
+resize=false
+trim=false
+start_time=""
+end_time=""
+
+# Parse arguments
+while [[ $# -gt 0 ]]; do
+    case $1 in
+        -r|--resize)
+            resize=true
+            shift
+            ;;
+        -t|--trim)
+            trim=true
+            IFS='-' read -r start_time end_time <<< "$2"
+            shift 2
+            ;;
+        -rt)
+            resize=true
+            trim=true
+            IFS='-' read -r start_time end_time <<< "$2"
+            shift 2
+            ;;
+        *)
+            input_file=$1
+            shift
+            ;;
+    esac
+done
+
+# Check if file exists
+if [[ ! -f "$input_file" ]]; then
+    echo "[-] Error: File not found!! Please provide a valid file name"
+    exit 1
+fi
+
+# Convert relative path to absolute path
+input_file=$(realpath "$input_file")
+
+# Extract filename without extension
+filename="${input_file%.*}"
+
+# Set output filename
+output_file="${filename}_processed.mp4"
+
+# Ensure that start and end times are in HH:MM:SS format
+convert_to_standard_time() {
+    local time=$1
+    local hours minutes seconds
+    IFS=':' read -r hours minutes seconds <<< "$time"
+    printf "%02d:%02d:%02d" "$hours" "$minutes" "$seconds"
+}
+
+# Perform both resizing and trimming in one step if both flags are set
+if [[ "$resize" = true && "$trim" = true ]]; then
+    # Convert start and end times to HH:MM:SS format
+    start_time=$(convert_to_standard_time "$start_time")
+    end_time=$(convert_to_standard_time "$end_time")
+    
+    # Process the video (resize and trim)
+    process_video "$input_file" "$start_time" "$end_time" "$output_file"
+fi
+
+# Handle resizing only
+if [[ "$resize" = true && "$trim" = false ]]; then
+    ffmpeg -i "$input_file" -vf "scale=1920:1080" -r 30 -c:v libx264 -crf 18 -preset slow -c:a copy "$output_file"
+    notify-send "Resize Complete" "Resized video saved as: $output_file"
+fi
+
+# Handle trimming only
+if [[ "$resize" = false && "$trim" = true ]]; then
+    # Convert start and end times to HH:MM:SS format
+    start_time=$(convert_to_standard_time "$start_time")
+    end_time=$(convert_to_standard_time "$end_time")
+
+    # Trim the video using standard HH:MM:SS format
+    ffmpeg -i "$input_file" -ss "$start_time" -to "$end_time" -c:v libx264 -crf 18 -preset slow -c:a aac -b:a 192k "$output_file"
+    notify-send "Trim Complete" "Your trimmed video has been saved as: $output_file"
+fi
+
