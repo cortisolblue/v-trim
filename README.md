@@ -8,7 +8,7 @@ ffmpeg is a powerful tool but I found it difficult to memorize the commands used
 You can copy the raw file into a text file and make it executable with chmod +x or git clone the repo and make the script executable
 
 ## Usage
-v-trim -t HH:MM:SS-HH:MM:SS
+v-trim -t HH:MM:SS-HH:MM:SS {INPUT_FILE}
 
 where the first HH:MM:SS is the starting timestamp and the second HH:MM:SS is the ending timestamp of the video
 
