@@ -8,7 +8,7 @@ ffmpeg is a powerful tool but I found it difficult to memorize the commands used
 You can copy the raw file into a text file and make it executable with chmod +x or git clone the repo and make the script executable
 
 ## Usage
-v-trim -t HH:MM:SS-HH:MM:SS {INPUT_FILE}
+```v-trim -t HH:MM:SS-HH:MM:SS {INPUT_FILE}```
 
 where the first HH:MM:SS is the starting timestamp and the second HH:MM:SS is the ending timestamp of the video
 
@@ -17,7 +17,7 @@ I originally created this script for a specific project which only required mp4 
 I'll look into adding more functionality to expand the output format options
 
 # Bonus
-v-trim -rt HH:MM::SS-HH:MM:SS
+v-trim ```-rt``` HH:MM::SS-HH:MM:SS
 The -r flag can be used to automatically resize video to 1920x1080@30fps. Again this is a limited feature that I plan on expanding eventually
 
 ## Disclaimer
