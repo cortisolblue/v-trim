@@ -16,7 +16,7 @@ where the first HH:MM:SS is the starting timestamp and the second HH:MM:SS is th
 I originally created this script for a specific project which only required mp4 videos so for now the script will automatically convert your video to mp4 format.
 I'll look into adding more functionality to expand the output format options
 
-# Bonus
+## Bonus
 v-trim ```-rt``` HH:MM::SS-HH:MM:SS
 The -r flag can be used to automatically resize video to 1920x1080@30fps. Again this is a limited feature that I plan on expanding eventually
 
